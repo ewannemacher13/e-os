@@ -1,62 +1,18 @@
-; Boot sector that prints using BIOS interrupt. This time programmer friendly
+; testing ground to implement new features
 
 [org 0x7c00]
 
-mov ah, 0x0e
-mov bp, 0x8c00
-mov sp, bp
+mov bp, 0x8000 ; set stack pointer bottom
+mov sp, bp ; set stack pointer start
 
-mov bx, msg
-call print
+mov dx, 0x6400
+call print_hex
 
-mov bx, msg
-mov al, [bx]
-;int 0x10 ; first byte of msg?
+jmp $
 
-add bx, 1
-mov al, [bx]
-;int 0x10
 
-add bx, 1
-mov al, [bx]
-;int 0x10
-
-jmp $ ; loop
-
-;print:
-;	pusha
-;	mov al, [bx]
-;	int 0x10
-;	popa
-;	ret
-
-print:
-	pusha
-	mov ah, 0x0e
-	l:
-		mov al, [bx]
-		cmp al, 0
-		je print_end
-		int 0x10
-		add bx, 1
-		jmp l
-	print_end:
-		popa
-		ret
-
-printchr:
-	pusha
-	mov ah, 0x0e
-	mov al, '.'
-	int 0x10
-	popa
-	ret
-
-msg:
-	db '987654321', 0
-
+; include files
+%include "../funct/print_hex.asm"
 
 times 510-($-$$) db 0 ; pad the sector
-
 dw 0xaa55 ; sector magic number
-
